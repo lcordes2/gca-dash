@@ -13,6 +13,13 @@ def load_data():
     cities = pd.read_excel("data/coordinates.xlsx")
     return infra_assets, cities
 
+def get_plot(filtered_assets, cities, hazard_var):
+    m = HazardAssetPlot(
+        infra_assets=filtered_assets,
+        cities=cities,
+        hazard_var=hazard_var
+    )
+    return m
 
 infra_assets, cities = load_data()
 
@@ -22,8 +29,8 @@ hazard_col, _,  asset_col = st.columns([4, 1, 2])
 
 with hazard_col:
     st.subheader("Hazards")
-    hazard_options = ["Coastal flooding","River flooding"]
-    hazard = st.selectbox("Hazard map", hazard_options)
+    hazard_options = ["Coastal flooding","Riverine flooding"]
+    hazard = st.selectbox("Hazard Map", hazard_options)
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -35,7 +42,7 @@ with hazard_col:
     with col3:
         rp = st.select_slider("Return period", [2, 10, 25, 50, 100])
 
-    flood_type = "inunriver" if hazard == "River flooding" else "inuncoast"
+    flood_type = "inunriver" if hazard == "Riverine flooding" else "inuncoast"
     hazard_var = f"{flood_type}__rp00{rp:03d}__{pathway}__{year}"
 
 
@@ -45,34 +52,28 @@ with asset_col:
     edu = st.checkbox("Schools", value=True)
     shelter = st.checkbox("Shelters", value=True)
     health = st.checkbox("Hospitals", value=True)
-    city_options = ["All cities"] + list(cities["City"].unique())
-    center_city = st.selectbox("Center on", city_options)
 
 
 included_types = list(compress(["edu", "health", "growth", "shelter"], [edu, health, growth, shelter]))
 filtered_assets = infra_assets[infra_assets["Type"].isin((included_types))]
 
-if center_city == "All cities":
-    loc = (23.241346102386135, 89.95056152343751)
-    zoom = 8
-else:
-    loc = (
-        cities.loc[(cities["Type"] == "City Center") & (cities["City"] == center_city),"Latitude"].iloc[0],
-        cities.loc[(cities["Type"] == "City Center") & (cities["City"] == center_city),"Longitude"].iloc[0]
-    )
-    zoom = 11
-
-m = HazardAssetPlot(
-    infra_assets=filtered_assets,
-    cities=cities,
-    hazard_var=hazard_var,
-    location=loc,
-    zoom_start=zoom
-)
-folium_static(m)
-#return_data = st_folium(m, pixelated=True)
+m = get_plot(filtered_assets, cities, hazard_var)
+# map_data = st_folium(m, pixelated=True)
+# st.write(map_data)
 # st.write(f"Using {hazard_var} flood map")
 
+if not "zoom" in st.session_state:
+    st.session_state["zoom"] = 8
+    st.session_state["center"] = (23.241346102386135, 89.95056152343751)
 
+data = st_folium(
+    m,
+    center=st.session_state["center"],
+    zoom=st.session_state["zoom"],
+    key="new",
+    height=400,
+    width=700,
+)
 
-
+st.write(data)
+st.write(st.session_state)

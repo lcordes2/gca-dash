@@ -8,8 +8,8 @@ import rasterio
 
 class HazardAssetPlot(Map):
 
-    def __init__(self, infra_assets, cities, hazard_var):
-        super().__init__()
+    def __init__(self, infra_assets, cities, hazard_var, zoom_start=8, location=(22, 90)):
+        super().__init__(zoom_start=zoom_start, location=location)
         self.radius = 10
         self.centers =cities[cities["Type"] == "City Center"]
         self.assets = pd.concat([cities[["Latitude", "Longitude", "Type", 'City']], infra_assets])
@@ -30,7 +30,7 @@ class HazardAssetPlot(Map):
         self.add_assets()
         self.add_bboxes()
         self.add_hazard_aqueduct()
-        self.center_map()
+        # self.center_map()
 
 
     def center_map(self):
