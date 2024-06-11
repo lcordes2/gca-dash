@@ -48,16 +48,16 @@ class HazardAssetPlot(Map):
 
 
     def add_assets(self):
-        marker_cluster = MarkerCluster().add_to(self)
+        marker_cluster = MarkerCluster(maxClusterRadius=30, spiderfyOnMaxZoom=True, disableClusteringAtZoom=11).add_to(self)
         for idx, row in self.assets.iterrows():
             popup = row["City"] if row["Type"] == "City Center" else f"{self.infra_labels[row['Type']]}"
             folium.Marker(
                 location=(row['Latitude'], row['Longitude']),
                 popup=popup,  
                 icon=folium.Icon(color=self.infra_cols[row['Type']]),  
-                max_cluster_radius=40,
-                disableClusteringAtZoom=12,  
-                spiderfyOnMaxZoom=True
+                #max_cluster_radius=40,
+                disableClusteringAtZoom=100,  
+                #spiderfyOnMaxZoom=True
                 ).add_to(marker_cluster)
 
 
@@ -95,8 +95,10 @@ class HazardAssetPlot(Map):
         ).add_to(self)
 
 
-    def add_colorbar(self):
-        colormap = cm.linear.Blues_08.scale(0, 10)
-        colormap.caption= "Predicted level of flooding in meters"
-        colormap.add_to(self)
 
+
+    def add_colorbar(self):
+        colors = cm.linear.Blues_08.colors
+        colormap = cm.LinearColormap(colors, vmin=0, vmax=10)
+        colormap.caption = "Predicted level of flooding in meters"
+        colormap.add_to(self)
