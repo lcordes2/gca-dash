@@ -16,35 +16,54 @@ def load_data():
 
 infra_assets, cities = load_data()
 
-st.title("7-Towns Dashboard Prototype")
+title_col, img_col = st.columns([2, 1])
 
-hazard_col, _,  asset_col = st.columns([4, 1, 2])
+with title_col:
+    st.title("7-Towns Dashboard")
+with img_col:
+    st.image("data/gca_logo.png")
+
+st.divider()
+hazard_col, _,  asset_col = st.columns([8, 1, 6])
 
 with hazard_col:
     st.subheader("Hazards")
     hazard_options = ["Coastal flooding","River flooding"]
-    hazard = st.selectbox("Hazard map", hazard_options)
+    hazard_help = """
+    Coastal flooding: Flooding resulting from storm surges along coastlines \n
+    River flooding: Flooding originating from river overflow
+    """
+    hazard = st.selectbox("Hazard map", hazard_options, help=hazard_help)
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        year = st.radio("Scenario year", [2030, 2050, 2080], index=1)
+        year_help = """
+        Year in which the predicted flooding is going to occur
+        """
+        year = st.radio("Scenario year", [2030, 2050, 2080], help=year_help)
 
     with col2:
-        pathway = st.radio("RCP", ["rcp4p5", "rcp8p5"])
+        pathway_help = """
+        RCP 4.5: Optimistic climate scenario assuming declining emissions from 2040 to 2100\n
+        RCP 8.5: Pessimistic climate scenario assuming steadyily increasing emissions until 2100
+        """
+        pathway = st.radio("Scenario Pathway", ["RCP 4.5", "RCP 8.5"], help=pathway_help)
 
     with col3:
-        rp = st.select_slider("Return period", [2, 10, 25, 50, 100])
+        rp_help = """Frequency with which the flooding event will reoccur"""
+        rp = st.select_slider("Return period", [2, 10, 25, 50, 100], help=rp_help)
 
+    rcp = "rcp4p5" if pathway == "RCP 4.5" else "rcp8p5"
     flood_type = "inunriver" if hazard == "River flooding" else "inuncoast"
-    hazard_var = f"{flood_type}__rp00{rp:03d}__{pathway}__{year}"
+    hazard_var = f"{flood_type}__rp00{rp:03d}__{rcp}__{year}"
 
 
 with asset_col:
     st.subheader("Assets")
-    growth = st.checkbox("Markets", value=True)
-    edu = st.checkbox("Schools", value=True)
-    shelter = st.checkbox("Shelters", value=True)
-    health = st.checkbox("Hospitals", value=True)
+    growth = st.checkbox("Market centres", value=True)
+    edu = st.checkbox("Educational institutions", value=True)
+    shelter = st.checkbox("Cyclone shelters", value=True)
+    health = st.checkbox("Healthcare institutions", value=True)
     city_options = ["All cities"] + list(cities["City"].unique())
     center_city = st.selectbox("Center on", city_options)
 

@@ -5,11 +5,12 @@ from folium.plugins import MarkerCluster
 from folium import Map
 import numpy as np
 import rasterio
+import branca.colormap as cm
 
 class HazardAssetPlot(Map):
 
     def __init__(self, infra_assets, cities, hazard_var, zoom_start=8, location=(22, 90)):
-        super().__init__(zoom_start=zoom_start, location=location)
+        super().__init__(zoom_start=zoom_start, location=location, attributionControl=0)
         self.radius = 10
         self.centers =cities[cities["Type"] == "City Center"]
         self.assets = pd.concat([cities[["Latitude", "Longitude", "Type", 'City']], infra_assets])
@@ -27,9 +28,18 @@ class HazardAssetPlot(Map):
             "edu": "beige",
             "shelter": "gray",
         }
+        self.infra_labels = {
+            "FSTP Site": "FSTP Site",
+            "City Center": "City Center",
+            "health": "Healthcare Facility",
+            "growth": "Market Centre",
+            "edu": "Educational Institution",
+            "shelter": "Cyclone Shelter",
+        }
         self.add_assets()
         self.add_bboxes()
         self.add_hazard_aqueduct()
+        self.add_colorbar()
         # self.center_map()
 
 
@@ -40,9 +50,10 @@ class HazardAssetPlot(Map):
     def add_assets(self):
         marker_cluster = MarkerCluster().add_to(self)
         for idx, row in self.assets.iterrows():
+            popup = row["City"] if row["Type"] == "City Center" else f"{self.infra_labels[row['Type']]}"
             folium.Marker(
                 location=(row['Latitude'], row['Longitude']),
-                popup=f"{row['Type'], row['City']}",  
+                popup=popup,  
                 icon=folium.Icon(color=self.infra_cols[row['Type']]),  
                 max_cluster_radius=40,
                 disableClusteringAtZoom=12,  
@@ -69,6 +80,12 @@ class HazardAssetPlot(Map):
                 fill=False,
             ).add_to(self)
 
+        folium.Rectangle(
+            bounds=self.overall_bounds,
+            color='black',
+            opacity=0.6,
+            fill=False,
+        ).add_to(self)
 
     def add_hazard_aqueduct(self):
         folium.raster_layers.ImageOverlay(
@@ -76,3 +93,10 @@ class HazardAssetPlot(Map):
             bounds=self.overall_bounds,
             opacity=0.7
         ).add_to(self)
+
+
+    def add_colorbar(self):
+        colormap = cm.linear.Blues_08.scale(0, 10)
+        colormap.caption= "Predicted level of flooding in meters"
+        colormap.add_to(self)
+
