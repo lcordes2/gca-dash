@@ -99,6 +99,6 @@ class HazardAssetPlot(Map):
 
     def add_colorbar(self):
         colors = cm.linear.Blues_08.colors
-        colormap = cm.LinearColormap(colors, vmin=0, vmax=10)
-        colormap.caption = "Predicted level of flooding in meters"
+        colormap = cm.LinearColormap(colors, vmin=0, vmax=3)
+        colormap.caption = "Predicted flooding intensity"
         colormap.add_to(self)
