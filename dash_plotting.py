@@ -91,7 +91,7 @@ class HazardAssetPlot(Map):
         folium.raster_layers.ImageOverlay(
             image=self.aqueduct_path,
             bounds=self.overall_bounds,
-            opacity=0.7
+            opacity=0.8
         ).add_to(self)
 
 

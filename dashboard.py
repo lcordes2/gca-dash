@@ -34,8 +34,8 @@ with st.sidebar:
     River flooding: Flooding originating from river overflow
     """
     hazard = st.radio("Hazard map", hazard_options, help=hazard_help)
+    flood_type = "inunriver" if hazard == "River flooding" else "inuncoast"
 
-    
     year_help = """
     Year in which the predicted flooding is going to occur
     """
@@ -49,10 +49,30 @@ with st.sidebar:
 
     rp_help = """Frequency with which the flooding event will reoccur"""
     rp = st.select_slider("Return period", [2, 10, 25, 50, 100], help=rp_help)
-
     rcp = "rcp4p5" if pathway == "RCP 4.5" else "rcp8p5"
-    flood_type = "inunriver" if hazard == "River flooding" else "inuncoast"
-    hazard_var = f"{flood_type}__rp00{rp:03d}__{rcp}__{year}"
+
+    if hazard == "Coastal flooding":
+        model_options = ["Low", "Medium", "High"]
+        model_help = """
+        Low: Probability of actual sea level rise being less than in model is 5%\n
+        Medium: Probability of actual sea level rise being less than in model is 50%\n
+        High: Probability of actual sea level rise being less than in model is 95% 
+        """
+        model = st.radio("Sea level rise projection", model_options, help=model_help)
+        model_name = 5 if model == "Low" else 50 if model == "Medium" else 95
+    else:
+        model_options = ['GFDL-ESM2M', 'HadGEM2-ES', 'IPSL-CM5A-LR', 'MIROC-ESM-CHEM', 'NorESM1-M']
+        model_help = """
+        GFDL-ESM2M: Geophysical Fluid Dynamics Laboratory (NOAA)\n
+        HadGEM2-ES: Met Office Hadley Centre\n
+        IPSL-CM5A-LR: Institut Pierre Simon Laplace\n
+        MIROC-ESM-CHEM: Atmosphere and Ocean Research Institute (The University of Tokyo), National Institute for Environmental Studies, and Japan Agency for Marine-Earth Science and Technology\n
+        NorESM1-M: Bjerknes Centre for Climate Research, Norwegian Meteorological Institute\n 
+        """
+        model = st.selectbox("Prediction model", model_options, help=model_help)
+        model_name = model
+
+    hazard_var = f"{flood_type}__rp00{rp:03d}__{rcp}__{year}__{model_name}"
 
     st.divider()
 
