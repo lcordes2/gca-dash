@@ -77,11 +77,11 @@ with st.sidebar:
     st.divider()
 
     st.subheader("Assets")
+    fstp = st.checkbox("FSTP Sites", value=True)
     growth = st.checkbox("Market centres", value=True)
-    edu = st.checkbox("Educational institutions", value=True)
     shelter = st.checkbox("Cyclone shelters", value=True)
     health = st.checkbox("Healthcare institutions", value=True)
-    fstp = st.checkbox("FSTP Sites", value=True)
+    edu = st.checkbox("Educational institutions", value=False)
 
 
 included_types = list(compress(["edu", "health", "growth", "shelter", "FSTP Site"], [edu, health, growth, shelter, fstp]))
