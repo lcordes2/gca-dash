@@ -19,7 +19,7 @@ class HazardAssetPlot(Map):
             bounds =  src.bounds
         self.overall_bounds = [[bounds.bottom, bounds.left], [bounds.top, bounds.right]]
         self.aqueduct_path = f'data/aqueduct/{hazard_var}.png'
-        self.alpha = 0.9
+        self.alpha = 0.8
         self.infra_cols = {
             "FSTP Site": "blue",
             "City Center": "red",
