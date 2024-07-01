@@ -48,7 +48,7 @@ with st.sidebar:
     pathway = st.radio("Scenario Pathway", ["RCP 4.5", "RCP 8.5"], help=pathway_help)
 
     rp_help = """Frequency with which the flooding event will reoccur"""
-    rp = st.select_slider("Return period", [2, 10, 25, 50, 100], help=rp_help)
+    rp = st.select_slider("Return period", [2, 5, 10, 25, 50, 100], help=rp_help)
     rcp = "rcp4p5" if pathway == "RCP 4.5" else "rcp8p5"
 
     if hazard == "Coastal flooding":

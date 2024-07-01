@@ -19,7 +19,7 @@ class HazardAssetPlot(Map):
             bounds =  src.bounds
         self.overall_bounds = [[bounds.bottom, bounds.left], [bounds.top, bounds.right]]
         self.aqueduct_path = f'data/aqueduct/{hazard_var}.png'
-
+        self.alpha = 0.9
         self.infra_cols = {
             "FSTP Site": "blue",
             "City Center": "red",
@@ -55,9 +55,6 @@ class HazardAssetPlot(Map):
                 location=(row['Latitude'], row['Longitude']),
                 popup=popup,  
                 icon=folium.Icon(color=self.infra_cols[row['Type']]),  
-                #max_cluster_radius=40,
-                disableClusteringAtZoom=100,  
-                #spiderfyOnMaxZoom=True
                 ).add_to(marker_cluster)
 
 
@@ -83,7 +80,7 @@ class HazardAssetPlot(Map):
         folium.Rectangle(
             bounds=self.overall_bounds,
             color='black',
-            opacity=0.6,
+            opacity=0.7,
             fill=False,
         ).add_to(self)
 
@@ -91,14 +88,16 @@ class HazardAssetPlot(Map):
         folium.raster_layers.ImageOverlay(
             image=self.aqueduct_path,
             bounds=self.overall_bounds,
-            opacity=0.8
+            opacity=self.alpha
         ).add_to(self)
 
 
 
 
     def add_colorbar(self):
-        colors = cm.linear.Blues_08.colors
-        colormap = cm.LinearColormap(colors, vmin=0, vmax=3)
-        colormap.caption = "Predicted flooding intensity"
+        colors = cm.linear.Blues_06.colors
+        colors_alpha = [(t[0], t[1], t[2], t[3]*self.alpha) for t in colors]
+        colormap = cm.StepColormap(colors=colors_alpha, index=[0, 0.5, 1, 1.5, 2, 3, 5], vmin=0, vmax=5)
+        colormap.caption = "Predicted flooding depth in meters"
         colormap.add_to(self)
+
